@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="noimage.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3790">
+      <stop
+         style="stop-color:#004bbc;stop-opacity:1;"
+         offset="0"
+         id="stop3792" />
+      <stop
+         id="stop3798"
+         offset="0.0625"
+         style="stop-color:#2a7fff;stop-opacity:1;" />
+      <stop
+         style="stop-color:#bfd8ff;stop-opacity:1;"
+         offset="0.125"
+         id="stop3800" />
+      <stop
+         id="stop3802"
+         offset="0.22916667"
+         style="stop-color:#0046af;stop-opacity:1;" />
+      <stop
+         style="stop-color:#2a7fff;stop-opacity:1;"
+         offset="1"
+         id="stop3794" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3790"
+       id="linearGradient3796"
+       x1="10"
+       y1="0.36218262"
+       x2="10"
+       y2="48.362183"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.313709"
+     inkscape:cx="37.335064"
+     inkscape:cy="1029.3612"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1072"
+     inkscape:window-height="781"
+     inkscape:window-x="54"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="レイヤー 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#000000;stroke:none"
+       d="M 0,0.37499962 0,1.3749996 0,51.5625 l 1,0 0,-50.1875004 101.40625,0 0,-0.99999998 -101.40625,0 -1,0 z"
+       id="path2987-0"
+       inkscape:export-xdpi="899.94507"
+       inkscape:export-ydpi="899.94507"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\personal\UEC\X680x0\game\Ten-LAN\Ten-LAN_GameInstaller\ui.png" />
+    <path
+       style="fill:url(#linearGradient3796);stroke:none;fill-opacity:1"
+       d="m 0,0.36218262 64,0 0,47.99999738 -64,0 z"
+       id="path2987"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:8.00596619000000050px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:'DBストレート12';-inkscape-font-specification:'DBストレート12'"
+       x="9.1079006"
+       y="21.224457"
+       id="text3804"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3806"
+         x="9.1079006"
+         y="21.224457">no image</tspan></text>
+  </g>
+</svg>

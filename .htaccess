@@ -1,0 +1,4 @@
+<FilesMatch "\.(pm|dat|wiki|log)$">
+  deny from all
+</FilesMatch>
+DirectoryIndex index.cgi index.html index.htm
