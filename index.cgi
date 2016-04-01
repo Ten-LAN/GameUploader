@@ -9,7 +9,7 @@ use CGI;
 
 # Settings
 
-our @CATEGORY       = ( 'アクション', 'シューティング', 'スポーツ', 'レース',  'パズル',  'テーブル', 'シミュレーション', 'ロールプレイング', '対戦',    'ミニゲーム', 'その他' );
+our @CATEGORY       = ( 'アクション', 'シューティング', 'スポーツ', 'レース',  'パズル',  'テーブル', 'シミュレーション', 'ロールプレイング', '多人数',    'ミニゲーム', 'その他' );
 our @CATEGORY_COLOR = ( '#ff0091',    '#ff2828',        '#dbae00',  '#c2cb10', '#16f000', '#00a411',  '#008f9a',          '#004eff',          '#cf00ff', '#f400ff',    '#808080' );
 
 # Program
@@ -55,6 +55,7 @@ $cgi{ 'file'    }  = $query->param( 'file' )  ? $query->param( 'file' )  : '';
 
 # Upload screen shot.
 $cgi{ 'image'   }  = $query->param( 'image' ) ? $query->param( 'image' ) : '';
+$cgi{ 'imagenum'   }  = $query->param( 'imagenum' ) ? $query->param( 'imagenum' ) : '';
 $cgi{ 'page'    }  = $query->param( 'page' ) ? $query->param( 'page' ) : '';
 $cgi{ 'page'    }  = $cgi{ 'page' } =~ /[^ \d]/ || $cgi{ 'page' } eq '' ? 0 : $query->param( 'number' );
 # Game number.
@@ -261,6 +262,7 @@ sub HtmlForm()
   $form{ 'title' } = $form{ 'text' } = '';
   $form{ 'number' } = -1;
   $form{ 'idname' } = '';
+  $form{ 'imagenum' } = 1;
 
   my $checked_dvd = ' checked="checked"';
   my $checked = ' checked="checked"';
@@ -279,6 +281,7 @@ sub HtmlForm()
     $form{ 'idname' } = $data{ 'idname' };
     $form{ 'first' }  = $data{ 'first' };
     $form{ 'exe' }    = $data{ 'exe' };
+    $form{ 'imagenum' }    = $data{ 'imagenum' };
     if( $data{ 'dvd' } == 0 ){ $checked_dvd = ''; }
     if( $data{ 'pad2key' } == 0 ){ $checked = ''; }
     my @catelist = split( /,/, $data{ 'cate' } );
@@ -313,7 +316,7 @@ sub HtmlForm()
   }
   $html .= sprintf( '<div style="clear:both;"></div></td></tr>%s', "\n" );
   $html .= sprintf( '      <tr><td>ゲーム(ZIP)</td><td><input type="file" name="file" /></td></tr>%s', "\n" );
-  $html .= sprintf( '      <tr><td>スクリーンショット(PNG)</td><td><input type="file" name="image" /></td></tr>%s', "\n" );
+  $html .= sprintf( '      <tr><td>スクリーンショット(PNG)</td><td><input type="file" name="image" /><br><input type="text" name="imagenum" value="%d" />枚(半角数字)</td></tr>%s', $form{ 'imagenum' }, "\n" );
   if( $cgi{ 'number' } >= 0 )
   {
     $html .= sprintf( '      <tr><td>実行ファイルパス</td><td><input type="text" name="exe" value="%s" />※分かる人以外触らない</td></tr>%s', $form{ 'exe' }, "\n" );
@@ -525,6 +528,7 @@ sub GetGameSetting()
   my %data;
   $data{ 'title' } = $data{ 'text' } = '';
   $data{ 'date' } = $data{ 'dvd' } = $data{ 'pad2key' } = $data{ 'ver' } = 0;
+  $data{ 'imagenum' } = 1;
   $data{ 'cate' } = '';
 
   foreach( @data )
@@ -600,6 +604,7 @@ sub Upload()
   my $ret = '';
   my %data;
   my $ver = 0;
+  my $gver = 0;
   my $flag = 0;
   my $file = $GAMEDIR . '/' . &SearchGameDir( $cgi{ 'number' } ) . '/' . $SETTING;
 open(F,">upload.txt");
@@ -620,7 +625,8 @@ close(F);
       foreach ( @line )
       {
         my ( $key, $value ) = split ( /\=/, $_, 2 );
-        chomp ( $value );
+        #chomp ( $value );#改行コードによっては不発になる
+        $value =~ s/[\r\n]+\z//;#どの改行コードでもOKのはず
         if ( $key eq 'cate' )
         {
           push ( @{ $data{ $key } }, split( /,/, $value ) );
@@ -630,18 +636,26 @@ close(F);
         }
       }
 
-      if ( $data{ 'exe' } ne $cgi{ 'exe' } ||
+      $ver = $data{ 'ver' };
+      $gver = $data{ 'gver' };
+      if( $cgi{ 'file' } =~ /(\.zip)$/i )
+      {
+        $flag = 2;
+        ++$ver;
+        ++$gver;
+      }
+      elsif ( $data{ 'exe' } ne $cgi{ 'exe' } ||
            $data{ 'title' } ne $cgi{ 'title' } ||
            $data{ 'text' } ne $cgi{ 'text' } ||
-           $data{ 'pad2key' } ne $cgi{ 'pad2key' } ||
-           join ( '', @{ $data{ 'cate' } } ) ne join ( '', @{ $cgi{ 'category' } } )
+           $data{ 'imagenum' } != $cgi{ 'imagenum' } ||
+           $data{ 'dvd' } != $cgi{ 'dvd' } ||
+           $data{ 'pad2key' } != $cgi{ 'pad2key' } ||
+           join ( '', @{ $data{ 'cate' } } ) != join ( '', @{ $cgi{ 'category' } } )
          )
       {
         $flag = 1;
+        ++$ver;
       }
-
-      $ver = $data{ 'ver' };
-      if ( $cgi{ 'file' } =~ /(\.zip)$/i ){ ++$ver; }
     }
 open(F,">>upload.txt");
 print F "2.1] ($ver,$flag)\n";
@@ -671,7 +685,11 @@ close(F);
     #スクリーンショットの作成
     &CreateBinFile( $tpath.'/'.$SSFILE, $cgi{ 'image' } );
     #$ret += 2;
-    $flag = 1;
+    if( $flag <= 0 )
+    {
+      $flag = 1;
+      ++$ver;
+    }
   }else
   {
     #スクリーンショットがない場合は画像を追加する
@@ -689,7 +707,11 @@ close(F);
       binmode( STDOUT );
       print BIN $img;
       close( BIN );
-      $flag = 1;
+      if( $flag <= 0 )
+      {
+        $flag = 1;
+        ++$ver;
+      }
     }
     #過去のスクリーンショットがある場合はなにもしない
   }
@@ -698,10 +720,13 @@ close(F);
   {
     my $file;
     #ZIPファイルの作成
-    my $res = &CreateBinFile( $path.'/'.$TEMPZIP, $cgi{ 'file' } );
+    my $res = &CreateBinFile( $tpath.'/'.$TEMPZIP, $cgi{ 'file' } );
     #$ret += 1;
 
-    $flag = 2;
+    if( $flag <= 1 )
+    {
+      $flag = 2;
+    }
 open(F,">>upload.txt");
 print F "2.5] (" . $cgi{ 'file' } . ",$flag,$res)\n";
 close(F);
@@ -711,26 +736,9 @@ close(F);
 open(F,">>upload.txt");
 print F "3.0] ($flag)\n";
 close(F);
-  if( $flag > 1 )
+  if ( $flag > 0 )
   {
-    &CreateZip( $path );
-  } elsif ( $flag == 1 )
-  {
-open(F,">>upload.txt");
-print F "3] (save)\n";
-close(F);
-    &SaveSettingFile( $file,
-                      $cgi{ 'exe' },
-                      $cgi{ 'title' },
-                      $cgi{ 'text' },
-                      $cgi{ 'category' },
-                      $data{ 'idname' },
-                      $cgi{ 'dvd' },
-                      $cgi{ 'pad2key' },
-                      $data{ 'first' },
-                      $ver + 1,
-                      $data{ 'gver' } );
-
+    &CreateZip( $path, $gver );
   }
 
   return $ret;
@@ -755,9 +763,9 @@ sub CreateBinFile( $$ )
   return 1;
 }
 
-sub CreateZip( $ )
+sub CreateZip( $$ )
 {
-  my ( $path ) = @_;
+  my ( $path, $gver ) = @_;
   #ZIPファイルの解凍
   my $unzip;
   my @files;
@@ -769,13 +777,13 @@ close(F);
 
   $cgi{ 'first' } = 0;
 
-  if( -f $path.'/'.$TEMPZIP )
+  if( -f $path.'/../'.$TEMPZIP )
   {
     # 新規
 open(F,">>outlog.txt");
 print F "1.5] aaa\n";
 close(F);
-    $unzip = Archive::Zip->new( $path.'/'.$TEMPZIP );
+    $unzip = Archive::Zip->new( $path.'/../'.$TEMPZIP );
 
     #ファイル一覧の取得
     @files = $unzip->memberNames();
@@ -798,11 +806,11 @@ close(F);
   {
     # アップデート
 open(F,">>outlog.txt");
-print F "1.5] bbb ($path.'/'.$TEMPZIP)\n";
+print F "1.5] bbb ($path.'/../'.$TEMPZIP)\n";
 close(F);
-    my @dirs = split( /\//, $path );
-    my $num = pop( @dirs );
-    my $tpath = join( '/', @dirs );
+  my @dirs = split( /\//, $path );
+  my $tpath = join( '/', @dirs );
+  my $num = pop( @dirs );
 open(F,">>outlog.txt");
 print F "1.5] bbb ($tpath.'/'.($num-1).'.zip')\n";
 close(F);
@@ -866,7 +874,8 @@ close(F);
                     $cgi{ 'pad2key' },
                     $cgi{ 'first' },
                     $ver,
-                    $ver );
+                    $gver,
+		    $cgi{ 'imagenum' } );
 
   #設定ファイルの追加
   push( @files, $tpath.'/'.$SETTING );
@@ -905,10 +914,9 @@ return 0;
 
 sub SaveSettingFile()
 {
-  my ( $path, $exe, $title, $text, $cate, $idname, $dvd, $pad2key, $first, $ver, $gver ) = ( @_, '', '', '', '', '', '', '', '', '' );
-
+  my ( $path, $exe, $title, $text, $cate, $idname, $dvd, $pad2key, $first, $ver, $gver, $imagenum ) = ( @_, '', '', '', '', '', '', '', '', '', '' );
 #  if ( $path eq '' || $title eq '' || $text eq '' || $cate eq '' ||
-#       $idname eq '' || $pad2key eq '' || $ver eq '' )
+#       $idname eq '' || $pad2key eq '' || $ver eq '' || $imagenum eq '')
 #  {
 #    return -1;
 #  }
@@ -943,6 +951,11 @@ sub SaveSettingFile()
   push ( @data, sprintf( 'dvd=%d', $dvd ) );
   push ( @data, sprintf( 'ver=%d', $ver ) );
   push ( @data, sprintf( 'gver=%d', $gver ) );
+  if( $imagenum <= 0 )
+  {
+    $imagenum = 1;
+  }
+  push ( @data, sprintf( 'imagenum=%d', $imagenum ) );
 
   open( FILE, "> $path" );
   print FILE join( "\r\n", @data );
