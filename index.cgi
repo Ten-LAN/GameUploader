@@ -27,6 +27,8 @@ $cgi{ 'text'    }  = $query->param( 'text' )  ? $query->param( 'text' )  : '';
 $cgi{ 'pad2key' }  = $query->param( 'pad2key' )  ? $query->param( 'pad2key' )  : '0';
 # Is dvd.
 $cgi{ 'dvd' }  = $query->param( 'dvd' )  ? '1'  : '0';
+# Minimum PlayerNum
+$cgi{ 'minplnum' } = $query->param( 'minplnum' ) ? $query->param( 'minplnum' ) : '';
 
 # Main category.
 my $maincate   = $query->param( 'maincate' ) ? $query->param( 'maincate' ) : 0;
@@ -263,6 +265,7 @@ sub HtmlForm()
   $form{ 'number' } = -1;
   $form{ 'idname' } = '';
   $form{ 'imagenum' } = 1;
+  $form{ 'minplnum' } = 1;
 
   my $checked_dvd = ' checked="checked"';
   my $checked = ' checked="checked"';
@@ -284,6 +287,7 @@ sub HtmlForm()
     $form{ 'imagenum' }    = $data{ 'imagenum' };
     if( $data{ 'dvd' } == 0 ){ $checked_dvd = ''; }
     if( $data{ 'pad2key' } == 0 ){ $checked = ''; }
+    $form{ 'minplnum' }    = $data{ 'minplnum' };
     my @catelist = split( /,/, $data{ 'cate' } );
     $maincate = shift( @catelist );
     foreach( @catelist ){ $cate[ $_ ] = ' checked="checked"'; }
@@ -327,6 +331,7 @@ sub HtmlForm()
   {
     $html .= sprintf( '      <tr><td>識別名</td><td><input type="text" name="idname" value="%s" /><br />半角英数のみ。設定すると少し嬉しい。</td></tr>%s', $form{ 'idname' }, "\n" );
   }
+  $html .= sprintf( '      <tr><td>最小プレイ人数</td><td><input type="text" name="minplnum" value="%d" />人(半角数字)</td></tr>%s', $form{ 'minplnum' }, "\n" );
   $html .= sprintf( '      <tr><td>DVD収録</td><td><input type="checkbox" name="dvd" value="1" %s /></td></tr>%s', $checked_dvd, "\n" );
   $html .= sprintf( '      <tr><td>パッドキー変換有効</td><td><input type="checkbox" name="pad2key" value="1" %s /></td></tr>%s', $checked, "\n" );
   $html .= sprintf( '     </table>
@@ -529,6 +534,7 @@ sub GetGameSetting()
   $data{ 'title' } = $data{ 'text' } = '';
   $data{ 'date' } = $data{ 'dvd' } = $data{ 'pad2key' } = $data{ 'ver' } = 0;
   $data{ 'imagenum' } = 1;
+  $data{ 'minplnum' } = 1;
   $data{ 'cate' } = '';
 
   foreach( @data )
@@ -650,6 +656,7 @@ close(F);
            $data{ 'imagenum' } != $cgi{ 'imagenum' } ||
            $data{ 'dvd' } != $cgi{ 'dvd' } ||
            $data{ 'pad2key' } != $cgi{ 'pad2key' } ||
+           $data{ 'minplnum' } != $cgi{ 'minplnum' } ||
            join ( '', @{ $data{ 'cate' } } ) != join ( '', @{ $cgi{ 'category' } } )
          )
       {
@@ -875,7 +882,8 @@ close(F);
                     $cgi{ 'first' },
                     $ver,
                     $gver,
-		    $cgi{ 'imagenum' } );
+		    $cgi{ 'imagenum' },
+                    $cgi{ 'minplnum' } );
 
   #設定ファイルの追加
   push( @files, $tpath.'/'.$SETTING );
@@ -914,7 +922,7 @@ return 0;
 
 sub SaveSettingFile()
 {
-  my ( $path, $exe, $title, $text, $cate, $idname, $dvd, $pad2key, $first, $ver, $gver, $imagenum ) = ( @_, '', '', '', '', '', '', '', '', '', '' );
+  my ( $path, $exe, $title, $text, $cate, $idname, $dvd, $pad2key, $first, $ver, $gver, $imagenum, $minplnum ) = ( @_, '', '', '', '', '', '', '', '', '', '', '' );
 #  if ( $path eq '' || $title eq '' || $text eq '' || $cate eq '' ||
 #       $idname eq '' || $pad2key eq '' || $ver eq '' || $imagenum eq '')
 #  {
@@ -956,6 +964,11 @@ sub SaveSettingFile()
     $imagenum = 1;
   }
   push ( @data, sprintf( 'imagenum=%d', $imagenum ) );
+  if( $minplnum <= 0 )
+  {
+    $minplnum = 1;
+  }
+  push ( @data, sprintf( 'minplnum=%d', $minplnum ) );
 
   open( FILE, "> $path" );
   print FILE join( "\r\n", @data );
